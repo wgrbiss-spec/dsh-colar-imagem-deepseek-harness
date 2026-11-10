@@ -14,8 +14,9 @@ Paste clipboard images into the **DeepSeek Harness Desktop** composer with the *
 
 - **Colar imagem** in the composer's right-click menu, localized (Portuguese / English).
 - Image is **attached to the draft** exactly like a native paste: preview thumbnail, upload progress, size/count limits and Host refusal messages all keep working.
-- **Workspace copy** of every pasted image: `<workspace>/pasted-images/YYYY-MM-DD/colada-YYYY-MM-DD-HH-MM-SS.png` (folder and date grouping are configurable).
-- **Ctrl+V untouched**: the native paste keeps working; the plugin can also keep a copy for it (on by default).
+- **Optional workspace copy**: turn it on to save every pasted image under `<workspace>/pasted-images/YYYY-MM-DD/colada-YYYY-MM-DD-HH-MM-SS.png` (folder and date grouping are configurable). **Off by default** — the plugin only attaches the image.
+- **Ctrl+V untouched**: the native paste keeps working; when workspace copies are on, the plugin can keep a copy for Ctrl+V too (off by default).
+- **Cleaner Settings header**: hides the official **“Open configuration file”** button (on by default; can be turned off).
 - Menu also keeps **Recortar / Copiar / Selecionar tudo** (Cut / Copy / Select all) so the composer is not left without the basic editing items.
 - **Fallback to text**: when the clipboard holds text, the menu becomes a plain **Colar / Paste** and inserts the text at the caret.
 - **Settings → COLAR IMAGEM**: enable/disable, workspace copies, Ctrl+V copies, copies folder, and a clipboard diagnostics panel.
@@ -36,7 +37,7 @@ dsh plugin --profile desktop add dsh-colar-imagem-deepseek-harness
 Or install a local tarball:
 
 ```sh
-dsh plugin --profile desktop add ./dsh-colar-imagem-deepseek-harness-0.1.0.tgz
+dsh plugin --profile desktop add ./dsh-colar-imagem-deepseek-harness-0.1.1.tgz
 ```
 
 Then **restart the Desktop app** (the Host half registers HTTP routes at startup; reloading the page is not enough). From the GUI you can also use **Plug-ins → Adicionar plugin** with the package name or a local directory.
@@ -45,13 +46,14 @@ Then **restart the Desktop app** (the Host half registers HTTP routes at startup
 
 1. Copy an image to the clipboard (screenshot tool, or "Copy image" in another app).
 2. **Right-click inside the message field** → **Colar imagem**.
-3. The image appears in the draft attachment rail, and the toast tells you where the workspace copy was saved.
+3. The image appears in the draft attachment rail. If workspace copies are enabled, the toast also tells you where the copy was saved.
 
 The plugin also appears under **Settings → COLAR IMAGEM**, with:
 
 - **Ativar o menu Colar no campo de mensagem** — turns the context menu replacement on/off.
-- **Guardar uma cópia no workspace** — writes `pasted-images/...` next to the message attachment.
-- **Guardar cópia também no Ctrl+V** — keeps native Ctrl+V and writes the same workspace copy.
+- **Guardar uma cópia no workspace** — off by default; writes `pasted-images/...` next to the message attachment.
+- **Guardar cópia também no Ctrl+V** — off by default (enabled once workspace copies are on); keeps native Ctrl+V and writes the same copy.
+- **Ocultar “Abra o arquivo de configuração”** — on by default; removes that button from the Settings header.
 - **Pasta das cópias** — workspace-relative folder (default `pasted-images`).
 - **Diagnóstico** — checks the clipboard now and can paste immediately.
 
@@ -64,7 +66,8 @@ Everything has a working default. Override fields in the profile's `cordis.patch
   config:
     pastedDir: pasted-images
     dateFolders: true
-    saveNativePastes: true
+    saveWorkspaceCopies: false
+    saveNativePastes: false
     maxClipboardBytes: 52428800
     clipboardTimeoutMs: 5000
 ```
@@ -73,7 +76,8 @@ Everything has a working default. Override fields in the profile's `cordis.patch
 |---|---|---|
 | `pastedDir` | `pasted-images` | Workspace-relative folder for the copies. Absolute paths and `..` fall back to the default. |
 | `dateFolders` | `true` | Add a `YYYY-MM-DD` subfolder per day. |
-| `saveNativePastes` | `true` | Default for the “Ctrl+V too” setting (the user setting wins after the first save). |
+| `saveNativePastes` | `false` | Default for the “Ctrl+V too” setting (the user setting wins after the first save). |
+| `saveWorkspaceCopies` | `false` | Default for “keep a copy in the workspace”; off means paste only attaches the image. |
 | `maxClipboardBytes` | `50 MiB` | Largest image accepted from the clipboard. |
 | `clipboardTimeoutMs` | `5000` | Budget for each system clipboard tool invocation. |
 
@@ -112,7 +116,7 @@ Existing files are never overwritten: a numeric suffix is added (`colada-....-2.
 
 - The composer context menu is **replaced** while the plugin is active. Undo/redo stay on `Ctrl+Z` / `Ctrl+Shift+Z`; the menu offers Paste, Cut, Copy and Select All.
 - Copy/Cut use the browser editing commands; a browser that refuses the command reports a toast instead of copying.
-- Only clipboard **image data** (and text) is handled. A file copied in a file manager as a file reference (`text/uri-list`) is not turned into an attachment in `0.1.0`.
+- Only clipboard **image data** (and text) is handled. A file copied in a file manager as a file reference (`text/uri-list`) is not turned into an attachment in `0.1.1`.
 - On Wayland the desktop must expose `wl-clipboard` (`wl-paste`); otherwise use the browser fallback.
 - Copies are never deleted automatically; clean up the folder when it gets large.
 - macOS/Windows backends are not covered by automated tests yet.
@@ -126,7 +130,7 @@ dev/run-e2e.sh        # isolated DSH web + Xvfb clipboard + Puppeteer end-to-end
 npm pack              # produces dsh-colar-imagem-deepseek-harness-<version>.tgz
 ```
 
-The end-to-end script starts its own `DSH_HOME`, Xvfb display, PNG clipboard and `dsh web` instance, then verifies: menu opens, “Colar imagem” attaches the image, the workspace file is written, the text menu variant works, the Ctrl+V hook writes a copy, and the Settings section renders and reads the clipboard (18 checks).
+The end-to-end script starts its own `DSH_HOME`, Xvfb display, PNG clipboard and `dsh web` instance, then verifies: menu opens, “Colar imagem” attaches the image, the workspace file is written, the text menu variant works, the Ctrl+V hook writes a copy, and the Settings section renders, reads the clipboard, hides the configuration-file button and flips the new defaults (24 checks).
 
 ## Publishing
 

@@ -105,6 +105,8 @@ window.__ModuleLoader__.load({
         saveCopyDesc: 'As imagens coladas viram arquivos dentro do projeto, além do anexo da mensagem.',
         saveNative: 'Guardar cópia também no Ctrl+V',
         saveNativeDesc: 'Mantém a colagem nativa e grava a mesma cópia no workspace.',
+        hideConfigFile: 'Ocultar “Abra o arquivo de configuração”',
+        hideConfigFileDesc: 'Remove esse botão do cabeçalho de Configurações.',
         folder: 'Pasta das cópias',
         folderDesc: 'Caminho relativo ao workspace. A data é adicionada em subpasta:',
         apply: 'Aplicar',
@@ -152,6 +154,8 @@ window.__ModuleLoader__.load({
         saveCopyDesc: 'Pasted images also become files inside the project, besides the message attachment.',
         saveNative: 'Keep a copy for Ctrl+V too',
         saveNativeDesc: 'Leaves the native paste untouched and writes the same copy into the workspace.',
+        hideConfigFile: 'Hide “Open configuration file”',
+        hideConfigFileDesc: 'Removes that button from the Settings header.',
         folder: 'Copies folder',
         folderDesc: 'Path relative to the workspace. The date is added as a subfolder:',
         apply: 'Apply',
@@ -211,7 +215,7 @@ window.__ModuleLoader__.load({
     //#endregion
 
     //#region configuração local
-    var hostConfig = { pastedDir: 'pasted-images', dateFolders: true, saveNativePastes: true, maxClipboardBytes: 52428800 }
+    var hostConfig = { pastedDir: 'pasted-images', dateFolders: true, saveWorkspaceCopies: false, saveNativePastes: false, maxClipboardBytes: 52428800 }
 
     function loadStoredSettings() {
       try {
@@ -227,8 +231,9 @@ window.__ModuleLoader__.load({
     var stored = loadStoredSettings()
     var settings = {
       enabled: stored.enabled === undefined ? true : stored.enabled !== false,
-      saveCopy: stored.saveCopy === undefined ? true : stored.saveCopy !== false,
-      saveNative: stored.saveNative === undefined ? hostConfig.saveNativePastes !== false : stored.saveNative !== false,
+      saveCopy: stored.saveCopy === undefined ? hostConfig.saveWorkspaceCopies === true : stored.saveCopy === true,
+      saveNative: stored.saveNative === undefined ? hostConfig.saveNativePastes === true : stored.saveNative === true,
+      hideConfigFile: stored.hideConfigFile === undefined ? true : stored.hideConfigFile !== false,
       pastedDir: typeof stored.pastedDir === 'string' && stored.pastedDir.trim().length > 0 ? stored.pastedDir.trim() : hostConfig.pastedDir,
     }
 
@@ -293,7 +298,8 @@ window.__ModuleLoader__.load({
           if (typeof hostConfig.pastedDir === 'string' && hostConfig.pastedDir.length > 0 && stored.pastedDir === undefined) {
             settings.pastedDir = hostConfig.pastedDir
           }
-          if (stored.saveNative === undefined) settings.saveNative = hostConfig.saveNativePastes !== false
+          if (stored.saveCopy === undefined) settings.saveCopy = hostConfig.saveWorkspaceCopies === true
+          if (stored.saveNative === undefined) settings.saveNative = hostConfig.saveNativePastes === true
         }
       } catch { /* usa os padrões locais */ }
     }
@@ -719,6 +725,50 @@ window.__ModuleLoader__.load({
     }
     //#endregion
 
+    //#region ocultar “Abra o arquivo de configuração”
+    /** Rótulos localizados do botão oficial que abre o arquivo de configuração. */
+    var CONFIG_FILE_LABEL = /(arquivo|ficheiro) de configura|archivo de configura|fichier de configuration|configuration file|configuratiebestand|配置文件|設定ファイル|файл конфигурации|Konfigurationsdatei|config file/i
+
+    /** Esconde/restaura ações de `settings.action` que abrem o arquivo de configuração. */
+    function hideConfigFileActions() {
+      if (typeof document === 'undefined') return
+      var slots = document.querySelectorAll('[data-slot="settings.action"]')
+      for (var i = 0; i < slots.length; i++) {
+        var children = slots[i].children
+        for (var j = 0; j < children.length; j++) {
+          var element = children[j]
+          var flagged = element.getAttribute('data-dsh-ci-hidden') === '1'
+          if (settings.hideConfigFile === true) {
+            if (flagged) continue
+            var label = (element.textContent || '').trim()
+            if (label.length === 0 || CONFIG_FILE_LABEL.test(label) !== true) continue
+            element.setAttribute('data-dsh-ci-hidden', '1')
+            element.style.display = 'none'
+          } else if (flagged) {
+            element.style.removeProperty('display')
+            element.removeAttribute('data-dsh-ci-hidden')
+          }
+        }
+      }
+    }
+
+    /** Mantém o botão oculto enquanto o plugin estiver ativo (a Configurações monta sob demanda). */
+    function attachConfigFileHider(ctx) {
+      return ctx.effect(function () {
+        hideConfigFileActions()
+        var timer = window.setInterval(hideConfigFileActions, 400)
+        return function () {
+          window.clearInterval(timer)
+          var hidden = document.querySelectorAll('[data-slot="settings.action"] [data-dsh-ci-hidden="1"]')
+          for (var i = 0; i < hidden.length; i++) {
+            hidden[i].style.removeProperty('display')
+            hidden[i].removeAttribute('data-dsh-ci-hidden')
+          }
+        }
+      }, 'colar-imagem: ocultar arquivo de configuração')
+    }
+    //#endregion
+
     //#region seção em Configurações
     var useSettingsState = null
 
@@ -803,6 +853,7 @@ window.__ModuleLoader__.load({
       function update(patch) {
         settings = Object.assign({}, settings, patch)
         persistSettings()
+        if (patch.hideConfigFile !== undefined) hideConfigFileActions()
         settingsInvalidate?.()
       }
 
@@ -861,6 +912,12 @@ window.__ModuleLoader__.load({
               disabled: settings.enabled !== true || settings.saveCopy === false,
               label: copy.saveNative,
               onChange: function () { update({ saveNative: settings.saveNative !== true }) },
+            })),
+          h(Row, { title: copy.hideConfigFile, desc: copy.hideConfigFileDesc },
+            h(Switch, {
+              checked: settings.hideConfigFile === true,
+              label: copy.hideConfigFile,
+              onChange: function () { update({ hideConfigFile: settings.hideConfigFile !== true }) },
             }))),
         h('div', { className: 'dci_group' },
           h('div', { className: 'dci_group_head' }, h('span', null, copy.folder)),
@@ -935,9 +992,9 @@ window.__ModuleLoader__.load({
     function publishDiagnostics() {
       try {
         window.__COLAR_IMAGEM__ = {
-          version: '0.1.0',
+          version: '0.1.1',
           state: function () {
-            return { sessionId: currentSessionId, enabled: settings.enabled, saveCopy: settings.saveCopy, saveNative: settings.saveNative, pastedDir: settings.pastedDir, lang: lang, lastSaved: lastSaved, hostConfig: hostConfig }
+            return { sessionId: currentSessionId, enabled: settings.enabled, saveCopy: settings.saveCopy, saveNative: settings.saveNative, hideConfigFile: settings.hideConfigFile, pastedDir: settings.pastedDir, lang: lang, lastSaved: lastSaved, hostConfig: hostConfig }
           },
           probe: probeClipboard,
         }
@@ -954,6 +1011,7 @@ window.__ModuleLoader__.load({
       attachContextMenu(ctx)
       registerMenuContribution(ctx)
       attachNativePasteCopyHook(ctx)
+      attachConfigFileHider(ctx)
       registerSettingsSections(ctx)
     }
 

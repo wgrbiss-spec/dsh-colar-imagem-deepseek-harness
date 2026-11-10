@@ -10,6 +10,7 @@
 #   - id: colar-imagem-deepseek-harness
 #     config:
 #       pastedDir: pasted-images
+#       saveWorkspaceCopies: true
 #       saveNativePastes: true
 - insert:
     - id: colar-imagem-deepseek-harness
@@ -17,6 +18,7 @@
       config:
         pastedDir: pasted-images
         dateFolders: true
-        saveNativePastes: true
+        saveWorkspaceCopies: false
+        saveNativePastes: false
         maxClipboardBytes: 52428800
         clipboardTimeoutMs: 5000

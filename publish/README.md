@@ -59,7 +59,7 @@ Regras que o catálogo/gerador usam:
 
 1. Crie `github.com/<owner>/dsh-colar-imagem-deepseek-harness` e envie o código.
 2. Adicione o tópico `dsh-plugin` no repositório.
-3. Opcional: tag/release `v0.1.0` com o `.tgz` anexado. O catálogo aceita
+3. Opcional: tag/release `v0.1.1` com o `.tgz` anexado. O catálogo aceita
    `tarball:` como alternativa ao npm, mas a entrada só aparece no
    `index.json`/Discover com pacote npm — então publique no npm.
 

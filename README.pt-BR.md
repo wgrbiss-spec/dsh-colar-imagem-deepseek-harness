@@ -14,8 +14,9 @@ O `Ctrl+V` já funciona no composer do Harness, mas o menu de contexto do shell 
 
 - **Colar imagem** no menu do botão direito do composer, em português e inglês.
 - A imagem é **anexada ao rascunho** como na colagem nativa: prévia, progresso de upload, limites de tamanho/quantidade e mensagens de recusa do Host continuam funcionando.
-- **Cópia no workspace** de cada imagem colada: `<workspace>/pasted-images/AAAA-MM-DD/colada-AAAA-MM-DD-HH-MM-SS.png` (pasta e agrupamento por data configuráveis).
-- **Ctrl+V intacto**: a colagem nativa continua igual; o plugin pode guardar cópia dela também (ligado por padrão).
+- **Cópia no workspace opcional**: ligue para gravar cada imagem colada em `<workspace>/pasted-images/AAAA-MM-DD/colada-AAAA-MM-DD-HH-MM-SS.png` (pasta e agrupamento por data configuráveis). **Desligada por padrão** — o plugin só anexa a imagem.
+- **Ctrl+V intacto**: a colagem nativa continua igual; com as cópias ligadas, o plugin pode guardar cópia dela também (desligado por padrão).
+- **Cabeçalho de Configurações mais limpo**: oculta o botão oficial **“Abra o arquivo de configuração”** (ligado por padrão; pode ser desligado).
 - O menu mantém **Recortar / Copiar / Selecionar tudo** para o composer não ficar sem os itens básicos de edição.
 - **Fallback para texto**: se o clipboard tiver texto, o menu vira **Colar** simples e insere o texto no cursor.
 - **Configurações → COLAR IMAGEM**: ligar/desligar, cópias no workspace, cópias do Ctrl+V, pasta das cópias e painel de diagnóstico da área de transferência.
@@ -36,7 +37,7 @@ dsh plugin --profile desktop add dsh-colar-imagem-deepseek-harness
 Ou instale um tarball local:
 
 ```sh
-dsh plugin --profile desktop add ./dsh-colar-imagem-deepseek-harness-0.1.0.tgz
+dsh plugin --profile desktop add ./dsh-colar-imagem-deepseek-harness-0.1.1.tgz
 ```
 
 Depois **reinicie o app Desktop** (a metade host registra rotas HTTP na inicialização; recarregar a página não basta). Pela interface também dá para usar **Plug-ins → Adicionar plugin** com o nome do pacote ou um diretório local.
@@ -45,13 +46,14 @@ Depois **reinicie o app Desktop** (a metade host registra rotas HTTP na iniciali
 
 1. Copie uma imagem para a área de transferência (print, ou “Copiar imagem” em outro app).
 2. **Clique com o botão direito no campo de mensagem** → **Colar imagem**.
-3. A imagem aparece na barra de anexos do rascunho e o aviso mostra onde a cópia foi salva.
+3. A imagem aparece na barra de anexos do rascunho. Se as cópias no workspace estiverem ligadas, o aviso também mostra onde a cópia foi salva.
 
 A página **Configurações → COLAR IMAGEM** traz:
 
 - **Ativar o menu Colar no campo de mensagem** — liga/desliga a troca do menu de contexto.
-- **Guardar uma cópia no workspace** — grava `pasted-images/...` junto do anexo da mensagem.
-- **Guardar cópia também no Ctrl+V** — mantém a colagem nativa e grava a mesma cópia.
+- **Guardar uma cópia no workspace** — desligada por padrão; grava `pasted-images/...` junto do anexo da mensagem.
+- **Guardar cópia também no Ctrl+V** — desligada por padrão (habilita quando as cópias estão ligadas); mantém a colagem nativa e grava a mesma cópia.
+- **Ocultar “Abra o arquivo de configuração”** — ligada por padrão; remove esse botão do cabeçalho de Configurações.
 - **Pasta das cópias** — pasta relativa ao workspace (padrão `pasted-images`).
 - **Diagnóstico** — confere o clipboard agora e permite colar na hora.
 
@@ -64,7 +66,8 @@ Tudo tem padrão funcional. Sobrescreva campos no `cordis.patch.yml` do perfil:
   config:
     pastedDir: pasted-images
     dateFolders: true
-    saveNativePastes: true
+    saveWorkspaceCopies: false
+    saveNativePastes: false
     maxClipboardBytes: 52428800
     clipboardTimeoutMs: 5000
 ```
@@ -73,7 +76,8 @@ Tudo tem padrão funcional. Sobrescreva campos no `cordis.patch.yml` do perfil:
 |---|---|---|
 | `pastedDir` | `pasted-images` | Pasta relativa ao workspace para as cópias. Caminho absoluto e `..` caem no padrão. |
 | `dateFolders` | `true` | Cria subpasta `AAAA-MM-DD` por dia. |
-| `saveNativePastes` | `true` | Padrão da opção “Ctrl+V também” (a escolha do usuário passa a valer depois do primeiro uso). |
+| `saveNativePastes` | `false` | Padrão da opção “Ctrl+V também” (a escolha do usuário passa a valer depois do primeiro uso). |
+| `saveWorkspaceCopies` | `false` | Padrão da opção “guardar cópia no workspace”; desligada = a colagem só anexa a imagem. |
 | `maxClipboardBytes` | `50 MiB` | Maior imagem aceita do clipboard. |
 | `clipboardTimeoutMs` | `5000` | Orçamento de cada chamada às ferramentas de clipboard. |
 
@@ -112,7 +116,7 @@ Arquivos existentes nunca são sobrescritos: um sufixo numérico é adicionado (
 
 - Enquanto o plugin está ativo, o menu de contexto do composer é **substituído**. Desfazer/refazer continuam em `Ctrl+Z` / `Ctrl+Shift+Z`; o menu oferece Colar, Recortar, Copiar e Selecionar tudo.
 - Copiar/Recortar usam os comandos de edição do navegador; se o navegador recusar, um aviso aparece em vez de copiar.
-- Só dados de **imagem** (e texto) são tratados. Um arquivo copiado no gerenciador de arquivos como referência (`text/uri-list`) não vira anexo na `0.1.0`.
+- Só dados de **imagem** (e texto) são tratados. Um arquivo copiado no gerenciador de arquivos como referência (`text/uri-list`) não vira anexo na `0.1.1`.
 - No Wayland o desktop precisa expor `wl-clipboard` (`wl-paste`); caso contrário, use o fallback do navegador.
 - As cópias nunca são apagadas automaticamente; limpe a pasta quando crescer.
 - Os backends de macOS/Windows ainda não têm testes automatizados.
@@ -126,7 +130,7 @@ dev/run-e2e.sh        # DSH web isolado + clipboard no Xvfb + Puppeteer ponta a 
 npm pack              # gera dsh-colar-imagem-deepseek-harness-<versão>.tgz
 ```
 
-O script ponta a ponta sobe `DSH_HOME` próprio, display Xvfb, PNG no clipboard e uma instância `dsh web`; depois verifica: menu abre, “Colar imagem” anexa a imagem, o arquivo é gravado no workspace, a variante de texto do menu funciona, o hook do Ctrl+V grava cópia e a seção de Configurações renderiza e lê o clipboard (18 verificações).
+O script ponta a ponta sobe `DSH_HOME` próprio, display Xvfb, PNG no clipboard e uma instância `dsh web`; depois verifica: menu abre, “Colar imagem” anexa a imagem, o arquivo é gravado no workspace, a variante de texto do menu funciona, o hook do Ctrl+V grava cópia, a seção de Configurações renderiza, lê o clipboard, oculta o botão de arquivo de configuração e alterna os novos padrões (24 verificações).
 
 ## Publicação
 

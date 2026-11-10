@@ -16,7 +16,7 @@ Pré-requisitos:
 
 ```sh
 # Sobe Xvfb + PNG no clipboard + dsh web isolado (DSH_HOME em .e2e/home),
-# instala o plugin por link no perfil de teste e roda as 18 verificações.
+# instala o plugin por link no perfil de teste e roda as 24 verificações.
 dev/run-e2e.sh                 # porta padrão 3099
 dev/run-e2e.sh 3100            # outra porta
 

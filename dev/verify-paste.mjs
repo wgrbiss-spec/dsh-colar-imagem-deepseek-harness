@@ -119,7 +119,60 @@ try {
   const state = await page.evaluate(() => window.__COLAR_IMAGEM__?.state?.() ?? null)
   check('composer montado (editor Lexical)', composer !== null, composer === null ? 'sem editor' : `${Math.round(composer.width)}x${Math.round(composer.height)}`)
   check('plugin ativo e sessão capturada', state !== null && typeof state.sessionId === 'string', state === null ? 'sem diagnóstico' : String(state.sessionId))
+  check('padrão: cópia no workspace desligada', state !== null && state.saveCopy === false && state.saveNative === false, state === null ? null : `saveCopy=${state.saveCopy}, saveNative=${state.saveNative}`)
+  check('padrão: opção de ocultar o botão de configuração ligada', state !== null && state.hideConfigFile === true, state === null ? null : String(state.hideConfigFile))
   await page.screenshot({ path: join(shots, 'e2e-1-composer.png') })
+
+  // 1b. Configurações: confere os padrões, o botão oculto e liga as cópias.
+  await page.evaluate(() => {
+    document.querySelector('button[aria-label="Menu da conta"], button[aria-label="Account menu"]')?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+  })
+  await wait(900)
+  await clickByText(['Configurações', 'Settings'], true)
+  await wait(1200)
+  await clickByText(['COLAR IMAGEM'])
+  await wait(1100)
+  const settingsInfo = await page.evaluate(() => {
+    const dialog = document.querySelector('[role="dialog"]') || document.body
+    const switches = [...document.querySelectorAll('[role="dialog"] .dci_switch')]
+    return { text: dialog.innerText, switches: switches.map((el) => el.getAttribute('aria-checked')) }
+  })
+  check('Configurações: 4 opções presentes', settingsInfo.switches.length === 4, settingsInfo.switches.join(','))
+  check('padrão das opções (menu on, cópias off, ocultar botão on)', JSON.stringify(settingsInfo.switches) === JSON.stringify(['true', 'false', 'false', 'true']), settingsInfo.switches.join(','))
+  const configButton = await page.evaluate(() => {
+    const slots = [...document.querySelectorAll('[data-slot="settings.action"]')]
+    let found = 0
+    let visible = 0
+    for (const slot of slots) {
+      for (const child of slot.children) {
+        if (!/arquivo de configura|configuration file/i.test(child.textContent || '')) continue
+        found += 1
+        if (getComputedStyle(child).display !== 'none') visible += 1
+      }
+    }
+    return { found, visible }
+  })
+  check('botão “Abra o arquivo de configuração” oculto', configButton.found > 0 && configButton.visible === 0, `encontrados=${configButton.found}, visíveis=${configButton.visible}`)
+  const toggled = await page.evaluate(() => {
+    const switches = [...document.querySelectorAll('[role="dialog"] .dci_switch')]
+    if (switches.length < 4) return false
+    switches[1].click() // "Guardar uma cópia no workspace"
+    return true
+  })
+  await wait(500)
+  const toggledNative = await page.evaluate(() => {
+    const switches = [...document.querySelectorAll('[role="dialog"] .dci_switch')]
+    if (switches.length < 4 || switches[2].disabled === true) return false
+    switches[2].click() // "Guardar cópia também no Ctrl+V"
+    return true
+  })
+  await wait(600)
+  const afterToggle = await page.evaluate(() => [...document.querySelectorAll('[role="dialog"] .dci_switch')].map((el) => el.getAttribute('aria-checked')).join(','))
+  check('cópias ligadas manualmente', toggled === true && toggledNative === true && afterToggle === 'true,true,true,true', afterToggle)
+  await page.keyboard.press('Escape')
+  await wait(700)
+  await page.keyboard.press('Escape')
+  await wait(400)
 
   // 2. Botão direito de verdade abre o menu do plugin.
   if (composer !== null) await rightClickComposer()

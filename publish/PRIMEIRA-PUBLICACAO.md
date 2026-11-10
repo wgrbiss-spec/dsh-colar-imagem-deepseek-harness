@@ -92,14 +92,14 @@ npm publish --access public --otp=123456
    ```sh
    git init
    git add .
-   git commit -m "COLAR IMAGEM DEEPSEEK HARNESS 0.1.0"
+   git commit -m "COLAR IMAGEM DEEPSEEK HARNESS 0.1.1"
    git branch -M main
    git remote add origin https://github.com/<seu-usuario>/dsh-colar-imagem-deepseek-harness.git
    git push -u origin main
    ```
 
 3. No repositório: **Settings → Topics** → adicione `dsh-plugin`.
-4. Opcional: release `v0.1.0` anexando o `.tgz` gerado por `npm pack`.
+4. Opcional: release `v0.1.1` anexando o `.tgz` gerado por `npm pack`.
 
 > O catálogo pede repositório com **pelo menos 1 dia** de vida. Se o CI
 > reclamar, abra o PR no dia seguinte — o npm já pode ser publicado hoje.
@@ -129,7 +129,7 @@ npm publish --access public --otp=123456
 Para testar em outra máquina sem publicar no npm:
 
 ```sh
-dsh plugin --profile <perfil> add ./dsh-colar-imagem-deepseek-harness-0.1.0.tgz
+dsh plugin --profile <perfil> add ./dsh-colar-imagem-deepseek-harness-0.1.1.tgz
 ```
 
 ## Problemas comuns na primeira vez

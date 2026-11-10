@@ -58,7 +58,9 @@ export const DEFAULT_CONFIG = {
   /** Separar as cópias em subpastas AAAA-MM-DD. */
   dateFolders: true,
   /** Salvar também as imagens coladas com Ctrl+V (além do botão direito). */
-  saveNativePastes: true,
+  saveNativePastes: false,
+  /** Padrão da opção “guardar cópia no workspace” (desligada por padrão). */
+  saveWorkspaceCopies: false,
   /** Limite de bytes de uma imagem lida da área de transferência. */
   maxClipboardBytes: 50 * 1024 * 1024,
   /** Orçamento da leitura da área de transferência (cada ferramenta do sistema). */
@@ -95,7 +97,8 @@ export function resolveConfig(config = {}) {
   return {
     pastedDir: normalizePastedDir(raw.pastedDir ?? DEFAULT_CONFIG.pastedDir),
     dateFolders: raw.dateFolders === undefined ? DEFAULT_CONFIG.dateFolders : raw.dateFolders !== false,
-    saveNativePastes: raw.saveNativePastes === undefined ? DEFAULT_CONFIG.saveNativePastes : raw.saveNativePastes !== false,
+    saveNativePastes: raw.saveNativePastes === undefined ? DEFAULT_CONFIG.saveNativePastes : raw.saveNativePastes === true,
+    saveWorkspaceCopies: raw.saveWorkspaceCopies === undefined ? DEFAULT_CONFIG.saveWorkspaceCopies : raw.saveWorkspaceCopies === true,
     maxClipboardBytes: Number.isFinite(maxClipboardBytes) && maxClipboardBytes > 0
       ? Math.min(maxClipboardBytes, 512 * 1024 * 1024)
       : DEFAULT_CONFIG.maxClipboardBytes,
@@ -317,10 +320,11 @@ export function apply(ctx, config = {}) {
         }
         sendJson(res, 200, {
           ok: true,
-          version: '0.1.0',
+          version: '0.1.1',
           defaults: {
             pastedDir: options.pastedDir,
             dateFolders: options.dateFolders,
+            saveWorkspaceCopies: options.saveWorkspaceCopies,
             saveNativePastes: options.saveNativePastes,
             maxClipboardBytes: options.maxClipboardBytes,
           },

@@ -1,6 +1,6 @@
 {
   "name": "dsh-colar-imagem-deepseek-harness",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "COLAR IMAGEM DEEPSEEK HARNESS — cola imagens da área de transferência no composer do app Desktop pelo menu do botão direito (Colar), anexa ao rascunho e guarda uma cópia em pasted-images/AAAA-MM-DD/ dentro do workspace. · Paste clipboard images into the DeepSeek Harness desktop composer with the right-click Paste menu, attach them to the draft and keep a copy under pasted-images/YYYY-MM-DD/ in the workspace.",
   "type": "module",
   "main": "src/index.js",
