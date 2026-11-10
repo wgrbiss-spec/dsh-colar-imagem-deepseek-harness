@@ -1,0 +1,17 @@
+# Entrada do catálogo comunitário (awesome-dsh-plugin).
+#
+# Destino: data/plugins/wgrbiss-spec__dsh-colar-imagem-deepseek-harness.yml no fork de
+# https://github.com/awesome-dsh-plugin/awesome-dsh-plugin
+#
+# Chaves permitidas pelo catálogo: url, name, category, description, icon, tarball.
+# Categorias válidas incluem: agi, ui, usage, theme, model, identity, session,
+# memory, tools, wsl, browser, vision, voice, docs, skill, workflow, git,
+# notify, dev, security, remote, market, fun.
+url: https://github.com/wgrbiss-spec/dsh-colar-imagem-deepseek-harness
+name: wgrbiss-spec/dsh-colar-imagem-deepseek-harness
+category: ui
+description:
+  en: 'Paste clipboard images into the Desktop composer with the right-click Paste menu: the image is attached to the draft and a copy is saved under pasted-images/YYYY-MM-DD/ in the workspace, with a localized Settings page.'
+  zh: '给 DSH 桌面版的输入框加上右键“粘贴图片”：图片照常附加到草稿，同时在 workspace 的 pasted-images/YYYY-MM-DD/ 下保存一份副本，并在设置页提供开关、目录与剪贴板诊断。'
+icon: https://raw.githubusercontent.com/wgrbiss-spec/dsh-colar-imagem-deepseek-harness/main/assets/icon-180.png
+# tarball: https://github.com/wgrbiss-spec/dsh-colar-imagem-deepseek-harness/releases/latest/download/dsh-colar-imagem-deepseek-harness-0.1.0.tgz

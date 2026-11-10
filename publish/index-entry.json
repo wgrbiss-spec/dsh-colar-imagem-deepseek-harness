@@ -1,0 +1,38 @@
+{
+  "_comment": "Referência da entrada gerada no index.json (plugin market index format 1). O gerador noturno do awesome-dsh-plugin monta isto sozinho a partir do npm + YAML do catálogo; use para conferir campos, não para publicar direto.",
+  "name": "dsh-colar-imagem-deepseek-harness",
+  "title": "wgrbiss-spec/dsh-colar-imagem-deepseek-harness",
+  "description": {
+    "en": "Paste clipboard images into the Desktop composer with the right-click Paste menu: the image is attached to the draft and a copy is saved under pasted-images/YYYY-MM-DD/ in the workspace, with a localized Settings page."
+  },
+  "homepage": "https://awesome-dsh-plugin.com/p/wgrbiss-spec/dsh-colar-imagem-deepseek-harness/",
+  "repository": {
+    "url": "https://github.com/wgrbiss-spec/dsh-colar-imagem-deepseek-harness"
+  },
+  "metadata": {
+    "category": "ui",
+    "keywords": [
+      "paste",
+      "clipboard",
+      "image",
+      "colar",
+      "imagem",
+      "screenshot",
+      "context-menu"
+    ],
+    "labels": [],
+    "sortKeys": {}
+  },
+  "versions": [
+    {
+      "version": "0.1.0",
+      "publishTimestamp": 1794300000,
+      "source": {
+        "type": "npm"
+      },
+      "engines": {
+        "dsh": ">=0.2.2-rc.1 <0.3.0-0"
+      }
+    }
+  ]
+}

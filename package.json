@@ -1,0 +1,71 @@
+{
+  "name": "dsh-colar-imagem-deepseek-harness",
+  "version": "0.1.0",
+  "description": "COLAR IMAGEM DEEPSEEK HARNESS — cola imagens da área de transferência no composer do app Desktop pelo menu do botão direito (Colar), anexa ao rascunho e guarda uma cópia em pasted-images/AAAA-MM-DD/ dentro do workspace. · Paste clipboard images into the DeepSeek Harness desktop composer with the right-click Paste menu, attach them to the draft and keep a copy under pasted-images/YYYY-MM-DD/ in the workspace.",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./client": "./client/client.js",
+    "./icon": "./assets/icon.svg",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src",
+    "client",
+    "assets",
+    "cordis.patch.yml",
+    "README.md",
+    "README.pt-BR.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "validate": "node scripts/validate-package.mjs",
+    "prepack": "node scripts/validate-package.mjs",
+    "set-owner": "node scripts/set-owner.mjs",
+    "publish:npm": "node scripts/publish.mjs"
+  },
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek",
+    "deepseek-harness",
+    "paste",
+    "clipboard",
+    "image",
+    "colar",
+    "imagem",
+    "screenshot",
+    "context-menu"
+  ],
+  "icon": "./assets/icon.svg",
+  "license": "MIT",
+  "author": "wgrbiss-spec",
+  "homepage": "https://github.com/wgrbiss-spec/dsh-colar-imagem-deepseek-harness#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wgrbiss-spec/dsh-colar-imagem-deepseek-harness.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=22",
+    "dsh": ">=0.2.2-rc.1 <0.3.0-0"
+  },
+  "dsh": {
+    "manifestVersion": 1,
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-context-menu",
+        "@deepseek-ai/dsh-client-ui-conversation",
+        "@deepseek-ai/dsh-client-ui-settings"
+      ]
+    }
+  }
+}

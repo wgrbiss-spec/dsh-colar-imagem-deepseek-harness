@@ -1,0 +1,7 @@
+node_modules/
+*.tgz
+.e2e/
+dev/shots/
+npm-debug.log*
+.DS_Store
+.npm-cache/

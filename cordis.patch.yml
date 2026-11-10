@@ -1,0 +1,22 @@
+# COLAR IMAGEM DEEPSEEK HARNESS — bundle patch layer.
+#
+# Instalar:
+#   dsh plugin --profile desktop add dsh-colar-imagem-deepseek-harness
+#
+# O dsh plugin acrescenta o pacote a `dsh.profile.bundles` e este patch monta a
+# linha do plugin. Para ajustar a configuração, sobrescreva `config:` no
+# cordis.patch.yml do perfil:
+#
+#   - id: colar-imagem-deepseek-harness
+#     config:
+#       pastedDir: pasted-images
+#       saveNativePastes: true
+- insert:
+    - id: colar-imagem-deepseek-harness
+      name: dsh-colar-imagem-deepseek-harness
+      config:
+        pastedDir: pasted-images
+        dateFolders: true
+        saveNativePastes: true
+        maxClipboardBytes: 52428800
+        clipboardTimeoutMs: 5000
