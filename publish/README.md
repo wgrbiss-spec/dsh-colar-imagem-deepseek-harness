@@ -98,7 +98,25 @@ O catálogo é o repositório **awesome-dsh-plugin/awesome-dsh-plugin** (o
 - Abra Configurações → **COLAR IMAGEM** e use o **Diagnóstico** para ver o
   clipboard atual.
 
-## 6. Atualizações
+## 6. Nota sobre o CI (escopo `workflow`)
+
+O arquivo `.github/workflows/ci.yml` só pode ser versionado por um token com o
+escopo **`workflow`** (além de `repo`). Um PAT sem esse escopo recebe:
+
+```text
+refusing to allow a Personal Access Token to create or update workflow
+`.github/workflows/ci.yml` without `workflow` scope
+```
+
+Opções:
+
+1. Gerar um token clássico com `repo` + `workflow` e rodar `git push`; ou
+2. Adicionar o arquivo pela interface web do GitHub (**Add file → Upload files**).
+
+O restante do repositório (código, docs, assets, kit de publicação) publica
+normalmente sem esse escopo.
+
+## 7. Atualizações
 
 - Bump de versão **não** exige novo PR no catálogo: o próximo probe noturno
   atualiza o `index.json`.
